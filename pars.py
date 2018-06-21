@@ -28,17 +28,12 @@ def parse(html):
         for i in range(len(prod)):
             if '' in prod:
                 prod.remove('')
-        title = prod[0]
-        money_ = prod[1]
-        money = money_.replace('\xa0', ' ')
-        name = cols[2].text
-        money2 = cols[3].text
 
         products.append({
-            'title': title.strip(),
-            'money': money.strip(),
-            'name': name.strip(),
-            'money2': money2.strip()
+            'title': prod[0].strip(),
+            'money': prod[1].replace('\xa0', ' ').strip(),
+            'name': cols[2].text.strip(),
+            'money2': cols[3].text.strip()
         })
 
     for product in products:

@@ -12,39 +12,15 @@
 # for s, i in enumerate(b):
 #     #d.append(i['id'])
 #     print(s, i)
-# -*- coding: utf-8 -*-
 
-class DecoratorTest(object):
-    """
-    Тестируем обычный метод против @classmethod против @staticmethod
-    """
-    def __init__(self):
-        """Конструктор"""
-        pass
+a = {'11510928160158': {
+    'link_vk': 'https://vk.com/wall-11510928_160158',
+    'id': '11510928160158',
+    'title': 'Складной нож Ganzo «G7211»',
+    'money': 'Обычная цена: 1890 руб.',
+    'name': 'Найк Бойцов',
+    'money2': '980 руб.'}
+    }
+for i in a:
+    print(i)
 
-    def doubler(self, x):
-        print("умножаем на 2")
-        return x*2
-
-    @classmethod
-    def class_tripler(klass, x):
-        print("умножаем на 3: %s" % klass)
-        return x*3
-
-    @staticmethod
-    def static_quad(x):
-        print("умножаем на 4")
-        return x*4
-
-
-if __name__ == "__main__":
-    decor = DecoratorTest()
-    print(decor.doubler(5))
-    print(decor.class_tripler(3))
-    print(DecoratorTest.class_tripler(3))
-    print(DecoratorTest.static_quad(2))
-    print(decor.static_quad(3))
-
-    print(decor.doubler)
-    print(decor.class_tripler)
-    print(decor.static_quad)

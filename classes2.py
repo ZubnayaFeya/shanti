@@ -85,7 +85,7 @@ class CParser:
 
     # проверка ушедших лотов и удаление их из словаря текущих, актуальных лотов
     def check_sold_lot(self):
-        for id, lot in self.full_lots.items():
+        for id, lot in self.full_lots.copy().items():
             if id not in self.lots:
                 self.full_lots.pop(id)
 
@@ -102,7 +102,7 @@ class CParser:
 
     # печать лота
     def print_lot(self, lot):
-        print('{} - {} - {} - {} - {}'.format(lot['id_lot'], lot['title'], lot['money'], lot['name'], lot['money2']))
+        print('{} - {} - Обычная цена: {} руб. - {} - {} руб.'.format(lot['id_lot'], lot['title'], lot['money'], lot['name'], lot['money2']))
 
     # основной цикл программы
     def mainloop(self):
@@ -111,7 +111,7 @@ class CParser:
         self.add_print_lots()
         print('всего {} лотов'.format(len(self.full_lots)))
         while True:
-            time.sleep(60)
+            time.sleep(600)
             page = self.get_page()
             self.parse(page)
             self.check_new_lots()

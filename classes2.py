@@ -25,13 +25,14 @@ class CParser:
         return table_auction
 
     # метод создания словаря одного лота
-    def new_lot(self, link, id_lot, product, base_price, buyer, current_price):
+    def new_lot(self, link, id_lot, product, base_price, buyer, current_price, hours_ago):
         self.lot['link_vk'] = link  # https://vk.com/wall-12345678_123456
-        self.lot['id'] = id_lot
+        self.lot['id_lot'] = id_lot
         self.lot['title'] = product
         self.lot['money'] = base_price
         self.lot['name'] = buyer
         self.lot['money2'] = current_price
+        self.lot['hours_ago'] = hours_ago
 
     # получения id из vk ссылки с помощью регулярки
     def get_id(self, link):
@@ -51,7 +52,8 @@ class CParser:
     def get_buyer_current_price(self, str_html_lot):
         buyer = str_html_lot[2].text.strip()
         current_price = str_html_lot[3].text.strip()
-        return buyer, current_price
+        hours_ago = str_html_lot[4].text.strip()
+        return buyer, current_price, hours_ago
 
     # наполнение словаря лотов из таблицы лотов с сайта
     def parse(self, html_data):
@@ -61,8 +63,8 @@ class CParser:
             id_lot = self.get_id(vk_link)
             raw_product_price = str_html_lot[1].text
             product, price = self.clean_product_price(raw_product_price)
-            buyer, current_price = self.get_buyer_current_price(str_html_lot)
-            self.new_lot(vk_link, id_lot, product, price, buyer, current_price)
+            buyer, current_price, hours_ago = self.get_buyer_current_price(str_html_lot)
+            self.new_lot(vk_link, id_lot, product, price, buyer, current_price, hours_ago)
             self.lots[id_lot] = self.lot.copy()
             self.lot.clear()
 
@@ -83,17 +85,24 @@ class CParser:
 
     # проверка ушедших лотов и удаление их из словаря текущих, актуальных лотов
     def check_sold_lot(self):
-        for id, lot in self.full_lots:
+        for id, lot in self.full_lots.items():
             if id not in self.lots:
                 self.full_lots.pop(id)
 
+    # проверка изменения последнего поставившего
+    def check_buyer(self):
+        for id, lot in self.lots.items():
+            if self.full_lots[id]['name'] != lot['name']:
+                print('{} сделал ставку на {} {} {}'.format(lot['name'], lot['title'], lot['money2'], lot['hours_ago']))
+                self.full_lots[id] = lot
+
     # добавление лотов в словарь текущих, актуальных лотов
     def add_lot(self, lot):
-        self.full_lots[lot['id']] = lot
+        self.full_lots[lot['id_lot']] = lot
 
     # печать лота
     def print_lot(self, lot):
-        print('{} - {} - {} - {} - {}'.format(lot['id'], lot['title'], lot['money'], lot['name'], lot['money2']))
+        print('{} - {} - {} - {} - {}'.format(lot['id_lot'], lot['title'], lot['money'], lot['name'], lot['money2']))
 
     # основной цикл программы
     def mainloop(self):
@@ -102,11 +111,12 @@ class CParser:
         self.add_print_lots()
         print('всего {} лотов'.format(len(self.full_lots)))
         while True:
-            time.sleep(600)
+            time.sleep(60)
             page = self.get_page()
             self.parse(page)
             self.check_new_lots()
             self.check_sold_lot()
+            self.check_buyer()
             self.lots.clear()
 
 

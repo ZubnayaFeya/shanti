@@ -13,6 +13,10 @@
 #     #d.append(i['id'])
 #     print(s, i)
 
+import time
+import db_api
+
+
 a = {'11510928160158': {
     'link_vk': 'https://vk.com/wall-11510928_160158',
     'id': '11510928160158',
@@ -23,4 +27,9 @@ a = {'11510928160158': {
     }
 for i in a:
     print(i)
+
+
+
+db = db_api.CManageDB()
+db.create_tables()
 

@@ -1,7 +1,7 @@
 #! /usr/lib/python3
 # -*- coding: utf-8 -*-
 
-### CONSTANTS ###
+# CONSTANTS #
 
 URL = 'https://шанти-шанти.рф/shantisales/'
 

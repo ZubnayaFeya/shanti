@@ -9,8 +9,8 @@ import re
 url = 'https://шанти-шанти.рф/shantisales/'
 
 
-def get_html(url):
-    response = urllib.request.urlopen(url)
+def get_html(url_s):
+    response = urllib.request.urlopen(url_s)
     return response.read()
 
 
@@ -24,7 +24,7 @@ def parse(html):
         cols = row.find_all('td')
         link = row.find_all('a')[0].get('href')
         pattern = r'[0-9]+[\_][0-9]+'
-        id = int(re.findall(pattern, link)[0])
+        id_l = int(re.findall(pattern, link)[0])
         a = cols[1].text
 
         prod = a.split('  ')
@@ -34,7 +34,7 @@ def parse(html):
 
         products.append({
             'link_vk': link,  # https://vk.com/wall-12345678_123456
-            'id': id,
+            'id': id_l,
             'title': prod[0].strip(),
             'money': prod[1].replace('\xa0', ' ').strip(),
             'name': cols[2].text.strip(),

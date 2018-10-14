@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sqlite3
-from time import time
-
-
 a = {'11510928160158': {
     'link_vk': 'https://vk.com/wall-11510928_160158',
     'id': 11510928160158,

@@ -131,8 +131,11 @@ class CParser:
 
 
 if __name__ == '__main__':
-    pars = CParser()
-    pars.mainloop()
+    try:
+        pars = CParser()
+        pars.mainloop()
+    except KeyboardInterrupt:
+        pars.db.cursor.close()
 
 '''
 сделал благодаря 

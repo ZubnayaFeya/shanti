@@ -8,12 +8,11 @@ class CManageDB:
         self.cursor = self.conn.cursor()
 
     def create_tables(self):
-        self.cursor.execute('create table if not exists all_lots (id integer primary key autoincrement, '
-                            'id_lot integer unique, vk_link text, title text, money text, flag integer)')
+        self.cursor.execute('create table if not exists all_lots(id_lot integer primary key unique, vk_link text, '
+                            'title text, money text, flag integer)')
 
-        self.cursor.execute('create table if not exists history (id integer primary key autoincrement, '
-                            'id_lot_table integer references all_lots (id), name text, '
-                            'money2 text, datetime real)')
+        self.cursor.execute('create table if not exists history (id_lot_table integer references all_lots (id_lot), '
+                            'name text, money2 text, datetime real)')
 
         self.conn.commit()
 
@@ -30,7 +29,7 @@ class CManageDB:
         self.cursor.execute('insert into history (id_lot_table, name, money2, datetime) '
                             'values (:id_lot, :name, :money2, :datetime)',
                             {"id_lot": lot['id'], "name": lot['name'],
-                            "money2": lot['money2'], "datetime": datetime})
+                             "money2": lot['money2'], "datetime": datetime})
         self.conn.commit()
 
     def get_actual_lot(self):
@@ -38,9 +37,8 @@ class CManageDB:
         return self.cursor.fetchall()
 
     def change_sold_lot(self, lot):
-        # self.cursor.execute('altertable ')
-        # self.conn.commit()
-        pass
+        self.cursor.execute('update all_lots set flag = 0 where id_lot = ?', (lot['id']))
+        self.conn.commit()
 
     def get_history_lot(self):
         pass

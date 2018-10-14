@@ -1,4 +1,3 @@
-#! /usr/lib/python3
 # -*- coding: utf-8 -*-
 
 import urllib.request
@@ -43,8 +42,12 @@ def parse(html):
         })
 
     for product in products:
-        print('{} - {} - {} - {} - {}'.format(product['id'], product['title'], product['money'], product['name'], product['money2']))
+        print(product)
+        print('{} - {} - {} - {} - {}'.format(product['id'], product['title'],
+                                              product['money'], product['name'],
+                                              product['money2']))
     print(len(products))
+
 
 def main():
     # parse(get_html('https://shanti-shanti.com/shantisales'))

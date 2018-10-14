@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sqlite3
 
 
@@ -17,26 +18,36 @@ class CManageDB:
         self.conn.commit()
 
     def add_lot_row(self, lot):
-
-        self.cursor.execute('insert or ignore into all_lots (id_lot, vk_link, title, money) '
-                            'values (:id_lot, :vk_link, :title, :money)',
-                            {"id_lot": lot['id_lot'], "vk_link": lot['vk_link'],
-                             "title": lot['title'], "money": lot['money']})
+        self.cursor.execute('insert into all_lots(id_lot, vk_link, title, money, flag) '
+                            'select :id_lot, :vk_link, :title, :money where not exists '
+                            '(select 1 from all_lots where id_lot = :id_lot)',
+                            {"id_lot": lot['id'], "vk_link": lot['link_vk'],
+                             "title": lot['title'], "money": lot['money'],
+                             "flag": 1})
         self.conn.commit()
 
-    def add_history_row(self, id_lot, lot, datetime):
+    def add_history_row(self, lot, datetime):
         self.cursor.execute('insert into history (id_lot_table, name, money2, datetime) '
                             'values (:id_lot, :name, :money2, :datetime)',
-                            {"id_lot": id_lot, "name": lot['name'],
+                            {"id_lot": lot['id'], "name": lot['name'],
                             "money2": lot['money2'], "datetime": datetime})
         self.conn.commit()
 
-    def get_id_lot(self, vk_id_lot):
-        self.cursor.execute('select id from all_lots where id_lot = ?', (vk_id_lot, ))
+    def get_actual_lot(self):
+        self.cursor.execute('select * from all_lots where flag = 1')
         return self.cursor.fetchall()
 
-    def get_lot(self):
+    def change_sold_lot(self, lot):
+        # self.cursor.execute('altertable ')
+        # self.conn.commit()
         pass
 
     def get_history_lot(self):
         pass
+
+
+if __name__ == '__main__':
+    db = CManageDB()
+    a = db.get_actual_lot()
+    db.cursor.close()
+    print(*a, sep='\n')

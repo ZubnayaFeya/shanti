@@ -1,4 +1,3 @@
-#! /usr/lib/python3
 # -*- coding: utf-8 -*-
 
 # import urllib.request  не подошёл так как не умеет работать с кирилическими url
@@ -8,6 +7,7 @@ import re
 import time
 
 import config
+from db_api import CManageDB
 
 
 class CParser:
@@ -16,6 +16,7 @@ class CParser:
         self.lots = {}
         self.lot = {}
         self.url = config.URL
+        self.db = CManageDB()
 
     # качаем страничку и возращаем таблицу лотов
     def get_page(self):
@@ -37,8 +38,8 @@ class CParser:
     # получения id из vk ссылки с помощью регулярки
     def get_id(self, link):
         pattern = r'[0-9]+[\_][0-9]+'
-        id = int(re.findall(pattern, link)[0])
-        return str(id)
+        id_l = int(re.findall(pattern, link)[0])
+        return str(id_l)
 
     # удаление лишних пробелов из полученых данных
     def clean_product_price(self, raw):
@@ -68,33 +69,41 @@ class CParser:
             self.lots[id_lot] = self.lot.copy()
             self.lot.clear()
 
-    # метод вывода лотов на момент запуска скрипта и добавление их в словарь текущих, актуальных лотов
+    def add_lot_in_db(self, lot):
+        self.db.add_lot_row(lot)
+        self.db.add_history_row(lot, time.time())
+
+    # метод вывода лотов на момент запуска скрипта и добавление их в словарь и бд текущих, актуальных лотов
     def add_print_lots(self):
         for _, lot in self.lots.items():
             self.print_lot(lot)
+            self.add_lot_in_db(lot)
             self.add_lot(lot)
         self.lots.clear()
 
     # проверка на появление новых лотов и добавление их в словарь текущих, актуальных лотов
     def check_new_lots(self):
-        for id, lot in self.lots.items():
-            if id not in self.full_lots:
+        for id_l, lot in self.lots.items():
+            if id_l not in self.full_lots:
                 self.print_lot(lot)
+                self.add_lot_in_db(lot)
                 self.add_lot(lot)
                 print('всего {} лотов'.format(len(self.full_lots)))
 
     # проверка ушедших лотов и удаление их из словаря текущих, актуальных лотов
     def check_sold_lot(self):
-        for id, lot in self.full_lots.copy().items():
-            if id not in self.lots:
-                self.full_lots.pop(id)
+        for id_l, lot in self.full_lots.copy().items():
+            if id_l not in self.lots:
+                self.full_lots.pop(id_l)
+                self.db.change_sold_lot(lot)
 
     # проверка изменения последнего поставившего
     def check_buyer(self):
-        for id, lot in self.lots.items():
-            if self.full_lots[id]['name'] != lot['name']:
+        for id_l, lot in self.lots.items():
+            if self.full_lots[id_l]['money2'] != lot['money2']:
                 print('{} сделал ставку на {} {} {}'.format(lot['name'], lot['title'], lot['money2'], lot['hours_ago']))
-                self.full_lots[id] = lot
+                self.full_lots[id_l] = lot
+                self.db.add_history_row(lot, time.time())
 
     # добавление лотов в словарь текущих, актуальных лотов
     def add_lot(self, lot):
@@ -102,7 +111,8 @@ class CParser:
 
     # печать лота
     def print_lot(self, lot):
-        print('{} - {} - Обычная цена: {} руб. - {} - {} руб.'.format(lot['id_lot'], lot['title'], lot['money'], lot['name'], lot['money2']))
+        print('{} - {} - Обычная цена: {} руб. - {} - {} руб.'.format(lot['id_lot'], lot['title'], lot['money'],
+                                                                      lot['name'], lot['money2']))
 
     # основной цикл программы
     def mainloop(self):

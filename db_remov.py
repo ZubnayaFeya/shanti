@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import sqlite3
 
 conn = sqlite3.connect("db_shanti.db")
@@ -9,3 +11,4 @@ cursor.execute("drop table history ")   # удалить таблицу history
 
 
 conn.commit()
+conn.close()

@@ -3,10 +3,10 @@ from time import time
 
 
 def add_lot_row(lot):
-    cursor.execute('insert into all_lots(id_lot, vk_link, title, money) ' 
-                   'values(select :id_lot, :vk_link, :title, :money' 
-                   'where not exists (select 1 from all_lots '
-                   'where id_lots = :id_lot))',
+    cursor.execute('insert into all_lots(id_lot, vk_link, title, money) '
+                   'select :id_lot, :vk_link, :title, :money '
+                   'where not exists '
+                   '(select 1from all_lots where id_lot = :id_lot)',
                    {"id_lot": lot['id_lot'], "vk_link": lot['vk_link'],
                     "title": lot['title'], "money": lot['money']})
 

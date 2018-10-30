@@ -58,16 +58,19 @@ class CParser:
 
     # наполнение словаря лотов из таблицы лотов с сайта
     def parse(self, html_data):
-        for html_lot in html_data.find_all('tr')[1:]:
-            str_html_lot = html_lot.find_all('td')
-            vk_link = html_lot.find_all('a')[0].get('href')  # https://vk.com/wall-12345678_123456
-            id_lot = self.get_id(vk_link)
-            raw_product_price = str_html_lot[1].text
-            product, price = self.clean_product_price(raw_product_price)
-            buyer, current_price, hours_ago = self.get_buyer_current_price(str_html_lot)
-            self.new_lot(vk_link, id_lot, product, price, buyer, current_price, hours_ago)
-            self.lots[id_lot] = self.lot.copy()
-            self.lot.clear()
+        try:
+            for html_lot in html_data.find_all('tr')[1:]:
+                str_html_lot = html_lot.find_all('td')
+                vk_link = html_lot.find_all('a')[0].get('href')  # https://vk.com/wall-12345678_123456
+                id_lot = self.get_id(vk_link)
+                raw_product_price = str_html_lot[1].text
+                product, price = self.clean_product_price(raw_product_price)
+                buyer, current_price, hours_ago = self.get_buyer_current_price(str_html_lot)
+                self.new_lot(vk_link, id_lot, product, price, buyer, current_price, hours_ago)
+                self.lots[id_lot] = self.lot.copy()
+                self.lot.clear()
+        except AttributeError:
+            pass
 
     def add_lot_in_db(self, lot):
         self.db.add_lot_row(lot)

@@ -20,26 +20,29 @@ def parse(html):
 
     products = []
 
-    for row in table.find_all('tr')[1:]:
-        cols = row.find_all('td')
-        link = row.find_all('a')[0].get('href')
-        pattern = r'[0-9]+[\_][0-9]+'
-        id_l = int(re.findall(pattern, link)[0])
-        a = cols[1].text
+    try:
+        for row in table.find_all('tr')[1:]:
+            cols = row.find_all('td')
+            link = row.find_all('a')[0].get('href')
+            pattern = r'[0-9]+[\_][0-9]+'
+            id_l = int(re.findall(pattern, link)[0])
+            a = cols[1].text
 
-        prod = a.split('  ')
-        for i in range(len(prod)):
-            if '' in prod:
-                prod.remove('')
+            prod = a.split('  ')
+            for i in range(len(prod)):
+                if '' in prod:
+                    prod.remove('')
 
-        products.append({
-            'link_vk': link,  # https://vk.com/wall-12345678_123456
-            'id': id_l,
-            'title': prod[0].strip(),
-            'money': prod[1].replace('\xa0', ' ').strip(),
-            'name': cols[2].text.strip(),
-            'money2': cols[3].text.strip()
-        })
+            products.append({
+                'link_vk': link,  # https://vk.com/wall-12345678_123456
+                'id': id_l,
+                'title': prod[0].strip(),
+                'money': prod[1].replace('\xa0', ' ').strip(),
+                'name': cols[2].text.strip(),
+                'money2': cols[3].text.strip()
+            })
+    except AttributeError:
+        pass
 
     for product in products:
         print(product)

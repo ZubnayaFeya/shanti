@@ -3,8 +3,9 @@
 import sqlite3
 from time import time
 from testing_data import *
+from db_api import CManageDB
 
-
+'''
 def add_lot_row(lot):
     cursor.execute('insert into all_lots(id_lot, vk_link, title, money, flag) '
                    'select :id_lot, :vk_link, :title, :money, :flag where not exists '
@@ -27,10 +28,10 @@ def add_history_row(lot, datetime):
                    "money2": lot['money2'], "datetime": datetime})
     conn.commit()
 
-
-conn = sqlite3.connect("db_shanti.db")
-cursor = conn.cursor()
-
+'''
+# conn = sqlite3.connect("db_shanti.db")
+# cursor = conn.cursor()
+'''
 cursor.execute('create table if not exists all_lots ('
                'id_lot integer primary key unique, vk_link text,'
                ' title text, money text, flag integer)')
@@ -39,18 +40,20 @@ cursor.execute('create table if not exists history ('
                'id_lot_table integer references all_lots (id_lot), '
                'name text, money2 text, datetime real)')
 conn.commit()
+'''
+db = CManageDB()
+db.create_tables()
 
-
-add_lot_row(a['11510928160158'])
-add_lot_row(b['11510928179946'])
-add_lot_row(c['11510928179799'])
+db.add_lot_row(a['11510928160158'])
+db.add_lot_row(b['11510928179946'])
+db.add_lot_row(c['11510928179799'])
 print(time())
-add_history_row(a['11510928160158'], time())
-add_history_row(b['11510928179946'], time())
-add_history_row(c['11510928179799'], time())
+db.add_history_row(a['11510928160158'], time())
+db.add_history_row(b['11510928179946'], time())
+db.add_history_row(c['11510928179799'], time())
 
-conn.commit()
-cursor.close()
+db.conn.commit()
+db.cursor.close()
 
 
 

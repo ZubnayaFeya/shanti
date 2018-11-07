@@ -45,7 +45,7 @@ def parse(html):
         pass
 
     for product in products:
-        print(product)
+        # print(product)
         print('{} - {} - {} - {} - {}'.format(product['id'], product['title'],
                                               product['money'], product['name'],
                                               product['money2']))

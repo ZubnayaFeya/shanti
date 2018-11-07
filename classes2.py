@@ -121,6 +121,7 @@ class CParser:
     def mainloop(self):
         page = self.get_page()
         self.parse(page)
+        self.db.create_tables()
         self.add_print_lots()
         print('всего {} лотов'.format(len(self.full_lots)))
         while True:

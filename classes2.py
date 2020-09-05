@@ -41,31 +41,26 @@ class CParser:
         id_l = int(re.findall(pattern, link)[0])
         return str(id_l)
 
-    # удаление лишних пробелов из полученых данных
-    def clean_product_price(self, raw):
-        raw_str = raw.split('  ')
-        for i in range(len(raw_str)):
-            if '' in raw_str:
-                raw_str.remove('')
-        return raw_str[0].strip(), raw_str[1].replace('\xa0', ' ').strip()
-
-    # получение имени последнего сделавшего ставку и его ставки
-    def get_buyer_current_price(self, str_html_lot):
-        buyer = str_html_lot[2].text.strip()
-        current_price = str_html_lot[3].text.strip()
-        hours_ago = str_html_lot[4].text.strip()
-        return buyer, current_price, hours_ago
+    # получение имени последнего сделавшего ставку и время ставки
+    def get_buyer_hours(self, str_html_lot):
+        raw = str_html_lot[1].find('div', {'class': 'text-muted mt-2'}).text.strip()
+        hours_ago, buyer = raw.split(',')
+        hours_ago = hours_ago[len('Последняя ставка: '):]
+        return buyer, hours_ago
 
     # наполнение словаря лотов из таблицы лотов с сайта
     def parse(self, html_data):
         try:
             for html_lot in html_data.find_all('tr')[1:]:
                 str_html_lot = html_lot.find_all('td')
+
                 vk_link = html_lot.find_all('a')[0].get('href')  # https://vk.com/wall-12345678_123456
                 id_lot = self.get_id(vk_link)
-                raw_product_price = str_html_lot[1].text
-                product, price = self.clean_product_price(raw_product_price)
-                buyer, current_price, hours_ago = self.get_buyer_current_price(str_html_lot)
+                product = str_html_lot[1].find('a').text.strip()
+                price = str_html_lot[1].find('s').text.strip().replace('\xa0', '')
+                current_price = str_html_lot[1].find('strong').text.strip()
+                buyer, hours_ago = self.get_buyer_hours(str_html_lot)
+
                 self.new_lot(vk_link, id_lot, product, price, buyer, current_price, hours_ago)
                 self.lots[id_lot] = self.lot.copy()
                 self.lot.clear()
@@ -135,8 +130,8 @@ class CParser:
 
 
 if __name__ == '__main__':
+    pars = CParser()
     try:
-        pars = CParser()
         pars.mainloop()
     except KeyboardInterrupt:
         pars.db.cursor.close()
